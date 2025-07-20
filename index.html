@@ -3,16 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>상속법 사례 분석 시뮬레이터 - 미리보기</title>
+    <title>상속법 사례 분석 시뮬레이터 (최종판)</title>
     <style>
         :root {
-            --primary-bg: #1a1a2e;
-            --secondary-bg: #16213e;
-            --card-bg: #0f3460;
-            --text-color: #e94560;
-            --body-text-color: #dcdcdc;
-            --accent-color: #16c79a;
-            --error-color: #e94560;
+            --primary-bg: #f4f7f9;
+            --secondary-bg: #ffffff;
+            --card-bg: #e9eef2;
+            --text-color: #2c3e50;
+            --body-text-color: #34495e;
+            --accent-color: #3498db;
+            --accent-color-darker: #2980b9;
+            --error-color: #e74c3c;
+            --error-color-darker: #c0392b;
+            --success-color: #2ecc71;
+            --success-color-darker: #27ae60;
             --font-main: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
@@ -24,9 +28,12 @@
             background-color: var(--primary-bg);
             color: var(--body-text-color);
             overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
-        .simulator-container {
+        .container {
             position: relative;
             width: 100%;
             height: 100%;
@@ -42,292 +49,236 @@
             width: 100%;
             height: 100%;
             z-index: 1;
+            pointer-events: none;
         }
-
-        .ui-container {
+        
+        .ui-panel {
             position: relative;
             z-index: 2;
-            width: 90%;
-            max-width: 800px;
-            background-color: rgba(15, 52, 96, 0.85);
+            width: 95%;
+            max-width: 1200px;
+            background-color: rgba(255, 255, 255, 0.85);
             backdrop-filter: blur(10px);
-            border: 1px solid var(--text-color);
+            border: 1px solid #dce4ec;
             border-radius: 15px;
-            padding: 2rem;
-            box-shadow: 0 0 30px rgba(233, 69, 96, 0.5);
+            padding: 2rem 2.5rem;
+            box-shadow: 0 10px 30px rgba(44, 62, 80, 0.1);
             animation: fadeIn 1s ease-in-out;
             max-height: 90vh;
             overflow-y: auto;
         }
 
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 2px solid var(--text-color);
-            padding-bottom: 1rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .header h1 {
-            color: var(--text-color);
-            margin: 0;
-            font-size: 1.8rem;
-        }
-
-        #score-display {
-            background-color: var(--accent-color);
-            color: var(--primary-bg);
-            padding: 0.5rem 1rem;
-            border-radius: 8px;
-            font-weight: bold;
-            font-size: 1.2rem;
-        }
-
-        #scenario-text {
-            background-color: var(--secondary-bg);
-            padding: 1rem;
-            border-radius: 8px;
-            margin-bottom: 1.5rem;
-            line-height: 1.6;
-            font-size: 1rem;
-        }
-        
-        #interaction-area h3 {
-            color: var(--accent-color);
-            margin-bottom: 1rem;
-        }
-
-        #heir-options, #amount-inputs {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-        }
-        
-        .heir-option label {
-            display: flex;
-            align-items: center;
-            background-color: var(--secondary-bg);
-            padding: 0.8rem;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s, transform 0.2s;
-        }
-        
-        .heir-option label:hover {
-            background-color: var(--card-bg);
-            transform: scale(1.02);
-        }
-        
-        .heir-option input[type="checkbox"] {
-            margin-right: 1rem;
-            width: 20px;
-            height: 20px;
-        }
-
-        .amount-input-group {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            background-color: var(--secondary-bg);
-            padding: 0.5rem 1rem;
-            border-radius: 5px;
-        }
-        
-        .amount-input-group label {
-            flex-shrink: 0;
-            width: 80px;
-            font-weight: bold;
-        }
-        
-        .amount-input-group input {
-            width: 100%;
-            padding: 0.5rem;
-            border-radius: 4px;
-            border: 1px solid var(--accent-color);
-            background-color: var(--primary-bg);
-            color: var(--body-text-color);
-            font-size: 1rem;
-        }
-        
-        .amount-input-group .unit-helper {
-            font-size: 0.9rem;
-            color: #aaa;
-        }
-
-        .button-container {
+        /* 난이도 선택 화면 */
+        #difficulty-selector { text-align: center; }
+        .main-title-card {
+            background: linear-gradient(135deg, var(--accent-color) 0%, var(--accent-color-darker) 100%);
+            color: #fff;
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 2.5rem;
             text-align: center;
-            margin-top: 2rem;
+            box-shadow: 0 8px 20px rgba(52, 152, 219, 0.3);
         }
+        .main-title-card .title-icon { font-size: 2.5rem; display: block; margin-bottom: 0.5rem; }
+        .main-title-card h2 { margin: 0; font-size: 2.2rem; font-weight: bold; }
+        .main-title-card p { margin: 0.5rem 0 0; font-size: 1.1rem; opacity: 0.9; }
+        #difficulty-selector h1 { color: var(--text-color); margin-bottom: 2.5rem; font-size: 2rem; }
+        .difficulty-buttons { display: flex; justify-content: center; gap: 1.5rem; flex-wrap: wrap; }
+        .difficulty-btn { padding: 1rem 2rem; font-size: 1.2rem; font-weight: bold; border: 2px solid var(--accent-color); border-radius: 8px; cursor: pointer; transition: all 0.3s ease; background-color: transparent; color: var(--accent-color); }
+        .difficulty-btn:hover { background-color: var(--accent-color); color: #fff; box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4); transform: translateY(-5px); }
 
-        .action-btn {
-            padding: 0.8rem 2rem;
-            font-size: 1.1rem;
-            font-weight: bold;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            color: var(--primary-bg);
-            margin: 0 0.5rem;
-        }
-
-        #submit-btn {
-            background-color: var(--accent-color);
-        }
+        /* 시뮬레이터 메인 화면 */
+        #simulator-main { display: none; }
+        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #e0e6ed; padding-bottom: 1rem; margin-bottom: 1.5rem; }
+        .header h1 { color: var(--text-color); margin: 0; font-size: 2rem; }
+        #score-display { background-color: var(--accent-color); color: #fff; padding: 0.5rem 1.5rem; border-radius: 8px; font-weight: bold; font-size: 1.4rem; transition: transform 0.3s; }
+        #scenario-text, #modal-explanation { background-color: #f8f9fa; border: 1px solid #e9ecef; color: var(--body-text-color); padding: 1.5rem; border-radius: 8px; margin-bottom: 1.5rem; line-height: 1.7; font-size: 1.1rem; max-height: 200px; overflow-y: auto; }
+        .legal-term { color: var(--accent-color); font-weight: bold; cursor: pointer; text-decoration: underline; text-decoration-style: dotted; }
+        #interaction-area h3 { color: var(--accent-color); margin-bottom: 1rem; font-size: 1.3rem; }
         
-        #submit-btn:hover {
-            box-shadow: 0 0 15px var(--accent-color);
-        }
-
-        #next-btn {
-            background-color: var(--text-color);
-            display: none; /* Initially hidden */
-        }
-
-        #next-btn:hover {
-            box-shadow: 0 0 15px var(--text-color);
-        }
-
-        /* Modal for results */
-        #modal {
-            display: none;
-            position: fixed;
-            z-index: 100;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.7);
-            animation: fadeIn 0.5s;
-        }
-
-        .modal-content {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) scale(0.9);
-            background-color: var(--secondary-bg);
-            padding: 2rem;
-            border-radius: 10px;
-            width: 80%;
-            max-width: 600px;
-            border-top: 5px solid;
-            animation: slideIn 0.5s forwards;
-        }
+        #drag-drop-area { display: flex; gap: 2rem; margin-top: 1.5rem; }
+        #amount-card-pool { width: 50%; min-height: 150px; background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 8px; padding: 1rem; transition: background-color 0.3s; }
+        #amount-card-pool.over { background-color: #e3f2fd; }
+        #heir-drop-zones { width: 50%; display: flex; flex-direction: column; gap: 1rem; }
         
-        #modal-result {
-            font-size: 2rem;
-            font-weight: bold;
-            margin-bottom: 1rem;
-            text-align: center;
-        }
+        .amount-card-creator { background-color: #e9eef2; border-radius: 25px; padding: 0.5rem 0.5rem 0.5rem 1rem; display: flex; align-items: center; margin-bottom: 1rem; border: 1px solid #dce4ec; box-shadow: inset 0 2px 4px rgba(0,0,0,0.06); }
+        .amount-card-creator .creator-icon { font-size: 1.2rem; margin-right: 0.5rem; }
+        .amount-card-creator input { flex-grow: 1; border: none; background: transparent; color: var(--text-color); font-size: 1rem; padding: 0.5rem; }
+        .amount-card-creator input:focus { outline: none; }
+        .amount-card-creator button { padding: 0.7rem 1.2rem; margin-left: 0.5rem; background: var(--accent-color); color: #fff; border: none; border-radius: 20px; cursor: pointer; font-weight: bold; transition: background-color 0.3s; }
+        .amount-card-creator button:hover { background-color: var(--accent-color-darker); }
         
-        #modal-explanation {
-            background-color: var(--primary-bg);
-            padding: 1rem;
-            border-radius: 5px;
-            line-height: 1.7;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        @keyframes slideIn {
-            from {
-                transform: translate(-50%, -70%) scale(0.8);
-                opacity: 0;
-            }
-            to {
-                transform: translate(-50%, -50%) scale(1);
-                opacity: 1;
-            }
-        }
+        #card-holder { min-height: 50px; }
+        .amount-card { position: relative; background: linear-gradient(135deg, var(--accent-color) 0%, var(--accent-color-darker) 100%); color: #fff; padding: 1rem; padding-right: 2.5rem; border-radius: 8px; text-align: center; font-weight: bold; cursor: grab; user-select: none; border: none; margin-top: 0.5rem; box-shadow: 0 4px 6px rgba(50,50,93,.11), 0 1px 3px rgba(0,0,0,.08); }
+        .amount-card:active { cursor: grabbing; opacity: 0.7; }
+        .amount-card.dragging { opacity: 0.5; }
+        .delete-card-btn { position: absolute; top: 50%; right: 10px; transform: translateY(-50%); font-size: 1.5rem; line-height: 1; font-weight: bold; color: rgba(255, 255, 255, 0.7); cursor: pointer; transition: color 0.2s, transform 0.2s; }
+        .delete-card-btn:hover { color: #fff; transform: translateY(-50%) scale(1.2); }
         
-        /* Responsive */
+        .drop-zone { background: #f8f9fa; border: 2px dashed #dce4ec; border-radius: 8px; padding: 1rem; display: flex; align-items: center; justify-content: space-between; transition: all 0.3s; min-height: 50px; }
+        .drop-zone.over { background-color: #e3f2fd; border-color: var(--accent-color); }
+        .drop-zone-label { font-weight: bold; color: var(--text-color); }
+        .drop-zone .amount-card { margin-left: 1rem; }
+
+        .button-container { display: flex; justify-content: center; gap: 1rem; margin-top: 2rem; flex-wrap: wrap; }
+        .action-btn { padding: 1rem 2.5rem; font-size: 1.2rem; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; transition: all 0.3s ease; color: #fff; }
+        #submit-btn { background-color: var(--accent-color); }
+        #submit-btn:hover { background-color: var(--accent-color-darker); box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4); }
+        #next-btn { display: none; }
+        #next-btn.correct { background-color: var(--success-color); }
+        #next-btn.correct:hover { background-color: var(--success-color-darker); }
+        #next-btn.incorrect { background-color: var(--error-color); }
+        #next-btn.incorrect:hover { background-color: var(--error-color-darker); }
+        #back-btn { background-color: #95a5a6; }
+        #back-btn:hover { background-color: #7f8c8d; }
+
+        /* 모달 (정답/용어집) */
+        .modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); animation: fadeIn 0.5s; }
+        .modal-content { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: var(--secondary-bg); padding: 2.5rem; border-radius: 10px; width: 80%; max-width: 700px; border-top: 5px solid; animation: slideIn 0.5s forwards; max-height: 80vh; overflow-y: auto; box-shadow: 0 10px 30px rgba(44, 62, 80, 0.2); }
+        #modal-result, #glossary-title { font-size: 2.2rem; font-weight: bold; margin-bottom: 1.5rem; text-align: center; }
+        #modal-explanation, #glossary-definition { background-color: #f8f9fa; border: 1px solid #e9ecef; padding: 1.5rem; border-radius: 5px; line-height: 1.8; font-size: 1.1rem; }
+
+        /* 결과 페이지 */
+        #results-page { display: none; text-align: center; }
+        #results-page h1 { color: var(--text-color); }
+        #results-summary { background: var(--secondary-bg); padding: 2rem; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        #results-summary p { font-size: 1.5rem; margin: 1rem 0; }
+        
+        /* 사운드 버튼 */
+        #sound-toggle { position: fixed; top: 20px; right: 20px; z-index: 101; font-size: 1.5rem; cursor: pointer; background: #fff; border-radius: 50%; width: 40px; height: 40px; display: flex; justify-content: center; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideIn { from { transform: translate(-50%, -70%) scale(0.8); opacity: 0; } to { transform: translate(-50%, -50%) scale(1); opacity: 1; } }
+        
         @media (max-width: 768px) {
-            .header h1 { font-size: 1.4rem; }
-            .ui-container { padding: 1.5rem; width: 95%; }
-            .amount-input-group { flex-direction: column; align-items: flex-start; }
-            .amount-input-group label { width: auto; margin-bottom: 0.5rem; }
-            .amount-input-group input { width: calc(100% - 1rem); }
+            .ui-panel { padding: 1.5rem; max-width: 95%; }
+            #drag-drop-area { flex-direction: column; }
+            #amount-card-pool, #heir-drop-zones { width: 100%; }
         }
-
     </style>
 </head>
 <body>
-
-    <div class="simulator-container">
+    <div class="container">
         <div id="scene-container"></div>
-        <div class="ui-container">
+        <div id="sound-toggle">🔊</div>
+
+        <div id="difficulty-selector" class="ui-panel">
+             <div class="main-title-card">
+                <span class="title-icon">⚖️</span>
+                <h2>솔로몬의 선택</h2>
+                <p>상속 사례 분석 퀴즈</p>
+            </div>
+            <h1>난이도 선택</h1>
+            <div class="difficulty-buttons">
+                <button class="difficulty-btn" data-difficulty="easy">쉬움</button>
+                <button class="difficulty-btn" data-difficulty="medium">중간</button>
+                <button class="difficulty-btn" data-difficulty="hard">어려움</button>
+                <button class="difficulty-btn" data-difficulty="very_hard">매우 어려움</button>
+            </div>
+        </div>
+
+        <div id="simulator-main" class="ui-panel">
             <div class="header">
-                <h1>상속법 사례 분석</h1>
+                <h1 id="simulator-title">상속법 사례 분석</h1>
                 <div id="score-display">점수: 0</div>
             </div>
-            
-            <div id="scenario-text">
-                사례를 불러오는 중입니다...
-            </div>
-            
+            <div id="scenario-text"></div>
             <div id="interaction-area">
-                <h3>1. 상속인을 모두 선택하세요.</h3>
-                <div id="heir-options"></div>
-
-                <h3>2. 상속인별 상속액을 입력하세요.</h3>
-                <div id="amount-inputs"></div>
+                <h3>1. 금액 카드를 만들어 아래 상속인에게 드래그하세요.</h3>
+                <div id="drag-drop-area">
+                    <div id="amount-card-pool">
+                        <div class="amount-card-creator">
+                            <span class="creator-icon">💰</span>
+                            <input type="text" id="amount-input" placeholder="금액 입력 (예: 1억 5000만)">
+                            <button id="create-card-btn">생성</button>
+                        </div>
+                        <div id="card-holder"></div>
+                    </div>
+                    <div id="heir-drop-zones"></div>
+                </div>
             </div>
-
             <div class="button-container">
+                <button id="back-btn" class="action-btn">난이도 선택으로</button>
                 <button id="submit-btn" class="action-btn">결과 확인</button>
                 <button id="next-btn" class="action-btn">다음 문제</button>
             </div>
         </div>
+
+        <div id="results-page" class="ui-panel">
+            <h1>학습 결과</h1>
+            <div id="results-summary"></div>
+            <div class="button-container">
+                 <button id="restart-btn" class="action-btn" style="background-color: var(--accent-color);">다시하기</button>
+            </div>
+        </div>
     </div>
 
-    <div id="modal">
+    <div id="answer-modal" class="modal">
         <div class="modal-content">
             <h2 id="modal-result"></h2>
             <div id="modal-explanation"></div>
         </div>
     </div>
 
+    <div id="glossary-modal" class="modal">
+        <div class="modal-content">
+            <h2 id="glossary-title"></h2>
+            <div id="glossary-definition"></div>
+        </div>
+    </div>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
     <script>
-        // --- 3D Background Scene ---
+        // --- 3D 배경 씬 ---
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ alpha: true });
+        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
         document.getElementById('scene-container').appendChild(renderer.domElement);
-
-        // Simple 3D object - a rotating legal document scroll
-        const geometry = new THREE.CylinderGeometry(0.5, 0.5, 3, 32);
-        const textureLoader = new THREE.TextureLoader();
-        // A placeholder texture to simulate text on a document
-        const material = new THREE.MeshStandardMaterial({ 
-            color: 0xfff8e1, 
-            roughness: 0.7,
-            metalness: 0.1,
-            map: textureLoader.load('https://threejs.org/examples/textures/uv_grid_opengl.jpg') // Placeholder texture
-        });
-        const scroll = new THREE.Mesh(geometry, material);
-        scene.add(scroll);
         
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
         scene.add(ambientLight);
-        const pointLight = new THREE.PointLight(0xffffff, 1);
-        pointLight.position.set(5, 5, 5);
-        scene.add(pointLight);
-
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 0.6);
+        directionalLight.position.set(5, 10, 7.5);
+        scene.add(directionalLight);
         camera.position.z = 5;
+
+        let scalesOfJustice = null;
+
+        function createScalesOfJustice() {
+            const group = new THREE.Group();
+            const beamMaterial = new THREE.MeshStandardMaterial({ color: 0x3498db, metalness: 0.7, roughness: 0.3 });
+            const baseMaterial = new THREE.MeshStandardMaterial({ color: 0x7f8c8d, metalness: 0.5, roughness: 0.6 });
+            const base = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.8, 0.3, 32), baseMaterial);
+            group.add(base);
+            const stand = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 3, 32), baseMaterial);
+            stand.position.y = 1.65;
+            group.add(stand);
+            const beam = new THREE.Mesh(new THREE.BoxGeometry(3, 0.1, 0.1), beamMaterial);
+            beam.position.y = 3.2;
+            group.add(beam);
+            for (let i = -1; i <= 1; i += 2) {
+                const pan = new THREE.Mesh(new THREE.CylinderGeometry(0.6, 0.5, 0.05, 32), beamMaterial);
+                pan.position.set(i * 1.2, 2.2, 0);
+                group.add(pan);
+                const lineMaterial = new THREE.LineBasicMaterial({ color: 0x3498db });
+                const points = [ new THREE.Vector3(i * 1.4, 3.2, 0), new THREE.Vector3(i * 1.2, 2.25, 0) ];
+                const line = new THREE.Line(new THREE.BufferGeometry().setFromPoints(points), lineMaterial);
+                group.add(line);
+            }
+            group.visible = false;
+            scene.add(group);
+            return group;
+        }
+
+        scalesOfJustice = createScalesOfJustice();
 
         function animate3D() {
             requestAnimationFrame(animate3D);
-            scroll.rotation.x += 0.005;
-            scroll.rotation.y += 0.005;
+            if (scalesOfJustice && scalesOfJustice.visible) {
+                scalesOfJustice.rotation.y += 0.005;
+            }
             renderer.render(scene, camera);
         }
         animate3D();
@@ -338,78 +289,183 @@
             renderer.setSize(window.innerWidth, window.innerHeight);
         });
 
-        // --- Simulator Logic ---
-        const scenarios = [
-            {
-                id: 1,
-                text: "A는 배우자 B, 자녀 C, D를 남기고 140억원의 재산을 남긴 채 사망했습니다. A의 형제 E도 있었습니다. 상속인과 각자의 상속액은 얼마일까요?",
-                possible_heirs: ["배우자 B", "자녀 C", "자녀 D", "형제 E"],
-                solution: {
-                    heirs: ["배우자 B", "자녀 C", "자녀 D"],
-                    amounts: {
-                        "배우자 B": 6000000000,
-                        "자녀 C": 4000000000,
-                        "자녀 D": 4000000000,
-                    }
-                },
-                explanation: "배우자와 직계비속(자녀)이 공동 상속인이므로 1순위 상속인입니다. 형제 E는 후순위로 상속권이 없습니다. 배우자는 자녀 상속분의 1.5배를 받으므로, 상속 비율은 B:C:D = 1.5:1:1 이 됩니다. 따라서 B는 60억, C와 D는 각각 40억을 상속받습니다."
-            },
-            {
-                id: 2,
-                text: "부자 A는 이혼한 전 배우자 B와의 자녀 C가 있습니다. A는 D와 사실혼 관계에서 자녀 E를 낳고 인지했습니다. A는 '내 재산 70억 전부를 C에게 물려준다'는 유언을 남기고 사망했습니다. 상속인과 각자의 최종 상속액은 얼마일까요? (단, E는 유류분을 청구함)",
-                possible_heirs: ["자녀 C", "사실혼 D", "자녀 E"],
-                solution: {
-                    heirs: ["자녀 C", "자녀 E"],
-                    amounts: {
-                        "자녀 C": 5250000000,
-                        "자녀 E": 1750000000
-                    }
-                },
-                explanation: "유언에 따라 C가 70억을 모두 상속받는 것이 원칙입니다. 하지만 직계비속인 E는 법정 상속분(35억)의 1/2인 17.5억을 유류분으로 청구할 수 있습니다. 사실혼 관계인 D는 상속권이 없습니다. 따라서 E가 유류분을 청구하면 최종적으로 C는 52.5억, E는 17.5억을 상속받게 됩니다."
-            },
-            // Add more scenarios here...
-        ];
+        // --- 시나리오 데이터 ---
+        const ALL_SCENARIOS = {
+            easy: [
+                { text: "피상속인 A는 배우자 B, 자녀 C를 남기고 30억원의 재산을 남긴 채 사망했습니다. 상속인은 누구이며, 각자의 상속액은 얼마일까요?", characters: ["배우자 B", "자녀 C", "A의 친구"], solution: { amounts: {"배우자 B": 1800000000, "자녀 C": 1200000000} }, explanation: "1순위 상속인은 배우자와 직계비속(자녀)입니다. 친구는 상속권이 없습니다. 배우자는 직계비속 상속분의 1.5배를 받으므로, 상속 비율은 B:C = 1.5:1 입니다. 따라서 B는 18억, C는 12억을 상속받습니다." },
+                { text: "피상속인 A는 미혼으로 자녀가 없으며, 부모님 B, C가 모두 생존해 계십니다. A가 남긴 재산 20억원은 어떻게 상속될까요?", characters: ["부모님 B", "부모님 C", "A의 삼촌"], solution: { amounts: {"부모님 B": 1000000000, "부모님 C": 1000000000} }, explanation: "1순위 상속인(직계비속, 배우자)이 없으므로 2순위인 직계존속(부모)이 상속인이 됩니다. 삼촌은 후순위이므로 상속권이 없습니다. 부모는 균등하게 상속받으므로 각각 10억씩 상속받습니다." },
+                { text: "피상속인 A는 배우자, 자녀, 부모님이 모두 없고 형제 B, C만 있습니다. A가 남긴 재산 10억원은 어떻게 상속될까요?", characters: ["형제 B", "형제 C", "B의 자녀"], solution: { amounts: {"형제 B": 500000000, "형제 C": 500000000} }, explanation: "1, 2순위 상속인이 없으므로 3순위인 형제자매가 상속인이 됩니다. B의 자녀(조카)는 B가 살아있으므로 상속권이 없습니다. 형제 B와 C가 10억원을 균등하게 나누어 각각 5억씩 상속받습니다."},
+                { text: "피상속인 A는 자녀 B, C를 남기고 사망했습니다. 배우자는 없습니다. A의 재산 80억원은 어떻게 분배될까요?", characters: ["자녀 B", "자녀 C", "A의 동생"], solution: { amounts: {"자녀 B": 4000000000, "자녀 C": 4000000000} }, explanation: "상속인은 1순위인 직계비속 B와 C입니다. 동생은 후순위입니다. 배우자가 없으므로 자녀들이 균등하게 상속받아 각각 40억씩 갖게 됩니다."},
+                { text: "피상속인 A는 배우자 B만 있고 다른 가족은 없습니다. A가 남긴 재산 150억원은 누구에게 상속될까요?", characters: ["배우자 B", "A의 오랜 친구"], solution: { amounts: {"배우자 B": 15000000000} }, explanation: "직계비속과 직계존속이 없는 경우, 배우자가 단독으로 상속받습니다. 친구는 상속권이 없습니다. 따라서 배우자 B가 150억 전액을 상속받습니다."}
+            ],
+            medium: [
+                { text: "피상속인 A는 배우자 B와 이혼 후, C와 재혼하여 살았습니다. A에게는 B와의 사이에서 낳은 자녀 D가 있습니다. A가 90억원의 재산을 남기고 사망했다면, 상속 관계는 어떻게 될까요?", characters: ["전 배우자 B", "현 배우자 C", "자녀 D"], solution: { amounts: {"현 배우자 C": 5400000000, "자녀 D": 3600000000} }, explanation: "이혼한 전 배우자 B는 상속권이 없습니다. 상속인은 현재 법률상 배우자인 C와 직계비속인 자녀 D입니다. 배우자 C는 자녀 D의 1.5배를 상속받으므로, C는 54억, D는 36억을 상속받습니다." },
+                { text: "피상속인 A에게는 배우자 B가 있고, B는 현재 A의 아이를 임신 중입니다. A가 50억원의 재산을 남기고 사망했다면, 상속은 어떻게 될까요? (단, 태아는 살아서 출생했다고 가정합니다.)", characters: ["배우자 B", "태아", "A의 어머니"], solution: { amounts: {"배우자 B": 3000000000, "태아": 2000000000} }, explanation: "민법상 태아는 상속 순위에 관하여 이미 출생한 것으로 봅니다. 따라서 상속인은 배우자 B와 태아입니다. 1순위 상속인이 있으므로 2순위인 A의 어머니는 상속권이 없습니다. 상속 비율은 1.5:1이므로 B가 30억, 태아가 20억을 상속받습니다." },
+                { text: "피상속인 A는 법률상 배우자 B와의 사이에 자녀가 없었으나, 혼외자 C를 인지하였습니다. A가 사망 시 남긴 재산 200억원은 누구에게 얼마나 상속될까요?", characters: ["배우자 B", "혼외자 C", "A의 동생"], solution: { amounts: {"배우자 B": 12000000000, "혼외자 C": 8000000000} }, explanation: "인지된 혼외자 C는 법률상 자녀와 동등한 상속권을 가집니다. 따라서 상속인은 배우자 B와 직계비속 C입니다. 1순위 상속인이 있으므로 3순위인 A의 동생은 상속권이 없습니다. 배우자 B가 1.5, C가 1의 비율로 상속받아 B는 120억, C는 80억을 상속받습니다."},
+                { text: "피상속인 A는 배우자 B와의 사이에서 자녀 C를 낳았고, 이후 D를 입양했습니다. A가 105억원의 재산을 남기고 사망했다면 상속액은 어떻게 될까요?", characters: ["배우자 B", "자녀 C", "양자 D"], solution: { amounts: {"배우자 B": 4500000000, "자녀 C": 3000000000, "양자 D": 3000000000} }, explanation: "양자는 법적으로 친자와 동일한 상속권을 가집니다. 따라서 상속인은 배우자 B, 친자 C, 양자 D입니다. 상속 비율은 B:C:D = 1.5:1:1 이므로, B는 45억, C와 D는 각각 30억씩 상속받습니다."},
+                { text: "피상속인 A는 사실혼 관계의 배우자 B와 살고 있으며, 그들 사이에 자녀 C를 낳아 인지했습니다. A에게는 법률상 혼인한 적이 없습니다. A가 100억원의 재산을 남기고 사망했다면 누가 상속받을까요?", characters: ["사실혼 배우자 B", "자녀 C"], solution: { amounts: {"자녀 C": 10000000000} }, explanation: "사실혼 관계의 배우자는 법정상속권이 없습니다. 하지만 인지된 자녀 C는 1순위 상속인입니다. 따라서 C가 단독으로 100억 전액을 상속받습니다."}
+            ],
+            hard: [
+                { text: "자수성가한 사업가 조씨는 전처 안씨와의 사이에 아들 갑을 두었으나 이혼했습니다. 이후 거래처에서 만난 진씨와 오랜 기간 교제하며 딸 을을 낳아 인지했고, 결국 진씨와 재혼했습니다. 진씨는 전 남편과의 사이에서 낳은 병과 정을 데려왔고, 조씨는 이들을 모두 입양했습니다. 그러나 아들 정은 '아버지가 둘일 수 없다'며 파양을 신청하여 절차가 완료되었습니다. 최근 조씨가 여행 중 불의의 사고로 사망하였으며, 252억원의 현금을 남겼습니다. 상속인과 각자의 상속액을 결정하세요.", characters: ["전처 안씨", "현 배우자 진씨", "아들 갑", "딸 을", "양자 병", "파양된 정"], solution: { amounts: {"현 배우자 진씨": 8400000000, "아들 갑": 5600000000, "딸 을": 5600000000, "양자 병": 5600000000} }, explanation: "1. 상속권자 확정: 전처 안씨(이혼), 파양된 정은 상속권이 없습니다. 1순위 상속인은 현 배우자 진씨와 직계비속인 아들 갑, 인지된 혼외자 을, 양자 병입니다.\n2. 상속분 계산: 배우자는 자녀의 1.5배를 상속받습니다. 상속 비율은 진씨:갑:을:병 = 1.5:1:1:1 입니다. 총 4.5 지분으로 252억원을 나눕니다. 1지분은 56억원(252억/4.5)입니다. 따라서 진씨는 84억(56억*1.5), 갑,을,병은 각각 56억씩 상속받습니다." },
+                { text: "부자 A는 '전 재산 140억을 자녀 C에게 물려준다'는 유효한 유언을 남기고 사망했습니다. A에게는 이혼한 전처와의 자녀 C 외에, 사실혼 관계에서 낳아 인지한 자녀 E가 있습니다. 이 경우 각 인물들이 최종적으로 받게 될 금액은 얼마일까요? (단, E는 유류분을 청구한다고 가정합니다.)", characters: ["자녀 C", "자녀 E", "A의 사실혼 배우자"], solution: { amounts: {"자녀 C": 10500000000, "자녀 E": 3500000000} }, explanation: "사실혼 배우자는 상속권이 없습니다. 유언에 따라 C가 140억 전액을 상속받지만, 또 다른 상속인 E는 유류분을 청구할 수 있습니다. E의 법정상속분은 70억(140억/2)이며, 유류분은 그 절반인 35억원입니다. 따라서 E가 유류분을 청구하면, 최종적으로 C는 105억(140억 - 35억), E는 35억을 받게 됩니다." },
+                { text: "피상속인 갑(甲)에게는 배우자 을(乙)과 아들 병(丙), 딸 정(丁)이 있습니다. 아들 병은 무(戊)와 결혼하여 손자 기(己)를 낳았습니다. 그런데 아들 병이 아버지 갑보다 먼저 교통사고로 사망했습니다. 몇 년 후, 갑이 210억원의 재산을 남기고 사망했습니다. 이 경우 상속은 어떻게 이루어질까요?", characters: ["배우자 을", "딸 정", "며느리 무", "손자 기"], solution: { amounts: {"배우자 을": 9000000000, "딸 정": 6000000000, "며느리 무": 3600000000, "손자 기": 2400000000} }, explanation: "이 사례는 '대습상속'에 해당합니다. 상속인이 될 아들 병이 먼저 사망했으므로, 그의 배우자(며느리 무)와 직계비속(손자 기)이 그의 상속분을 공동으로 대습상속합니다. 상속인들은 갑의 배우자 을, 딸 정, 그리고 [며느리 무와 손자 기]가 됩니다. 상속비율은 을:정:[병의 지위] = 1.5:1:1 입니다. 1지분은 60억(210억/3.5)입니다. 따라서 을은 90억, 정은 60억, [병의 지위]는 60억입니다. 이 60억을 며느리 무와 손자 기가 1.5:1의 비율로 나누므로, 무는 36억, 기는 24억을 상속받습니다." },
+                { text: "피상속인 A는 배우자 B와 자녀 C가 있습니다. A는 '내 재산 120억 전부를 내 오랜 친구 D에게 준다'는 유언을 남기고 사망했습니다. B와 C는 유류분을 청구하기로 했습니다. 최종적으로 B와 C는 얼마씩 받을 수 있을까요?", characters: ["배우자 B", "자녀 C", "친구 D"], solution: { amounts: {"배우자 B": 3600000000, "자녀 C": 2400000000} }, explanation: "유언에 따라 친구 D가 전 재산을 받지만, 상속인 B와 C는 유류분을 청구할 수 있습니다. 법정상속분은 B가 72억, C가 48억입니다. 유류분은 법정상속분의 1/2이므로, B는 36억, C는 24억을 D에게 반환 청구할 수 있습니다." },
+                { text: "피상속인 A와 그의 유일한 자녀 B는 같은 비행기 사고로 사망했습니다. A에게는 배우자 C와 생존한 부모님 F, G가 있습니다. A의 재산 210억원은 어떻게 분배될까요?", characters: ["배우자 C", "부모님 F", "부모님 G"], solution: { amounts: {"배우자 C": 9000000000, "부모님 F": 6000000000, "부모님 G": 6000000000} }, explanation: "동시사망 추정에 따라 자녀 B는 상속인이 될 수 없습니다. 따라서 상속인은 1순위 직계비속이 없는 상태이므로, 배우자 C와 2순위인 부모님 F, G가 공동상속인이 됩니다. 상속비율은 C:F:G = 1.5:1:1 입니다. 따라서 C는 90억, 부모님 F, G는 각각 60억을 상속받습니다." }
+            ],
+            very_hard: [
+                { text: "피상속인 A(재산 700억)는 '전 재산을 사회에 기부한다'는 유언을 남기고 사망했습니다. A에게는 배우자 B, 그리고 먼저 사망한 아들 C가 있습니다. C에게는 배우자 D와 아들 E가 있습니다. 상속인들은 모두 유류분을 청구하기로 했습니다. 최종적으로 각자는 얼마를 받을 수 있을까요?", characters: ["배우자 B", "C의 배우자 D", "C의 아들 E", "사회복지재단"], solution: { amounts: {"배우자 B": 21000000000, "C의 배우자 D": 8400000000, "C의 아들 E": 5600000000, "사회복지재단": 35000000000} }, explanation: "유언으로 상속을 못 받은 상속인들은 유류분을 청구할 수 있습니다. 1. 법정상속분 계산: B와 C가 상속했다면 B:C=1.5:1, 즉 B가 420억, C가 280억을 받았을 것입니다. 2. 유류분 계산: 유류분은 법정상속분의 1/2입니다. B의 유류분은 210억, C의 유류분은 140억입니다. 3. 대습상속 적용: C는 사망했으므로 C의 유류분 140억을 그의 상속인 D와 E가 대습상속합니다. D:E=1.5:1 비율로 나누므로, D는 84억, E는 56억을 받습니다. 사회복지재단은 700억에서 유류분 총액 350억을 뺀 350억을 받습니다." },
+                { text: "피상속인 A와 그의 아내 B는 자녀 없이 비행기 사고로 동시에 사망했습니다. A에게는 300억원의 재산과 생존한 부모님이 있고, B에게는 100억원의 재산과 생존한 오빠가 있습니다. 그런데 A에게는 사실혼 관계의 배우자 C와 그 사이에서 낳아 인지한 아들 D도 있었습니다. 각자의 재산은 어떻게 될까요?", characters: ["A의 아들 D", "B의 오빠", "A의 부모님", "사실혼 배우자 C"], solution: { amounts: {"A의 아들 D": 30000000000, "B의 오빠": 10000000000} }, explanation: "동시사망으로 A와 B는 서로 상속하지 않습니다. A의 재산 300억원은 1순위 상속인인 직계비속(아들 D)에게 모두 상속됩니다. A의 부모님과 사실혼 배우자 C는 상속권이 없습니다. B의 재산 100억원은 1,2순위 상속인이 없으므로 3순위인 형제자매(오빠)에게 모두 상속됩니다." },
+                { text: "피상속인 A(재산 700억)는 '아들 C에게 전 재산을 물려준다'는 유언을 남기고 사망했습니다. A에게는 배우자 B, 아들 C, 딸 D가 있습니다. B와 D는 유류분을 청구하기로 했습니다. 최종 상속액은 어떻게 될까요?", characters: ["배우자 B", "아들 C", "딸 D"], solution: { amounts: {"배우자 B": 15000000000, "아들 C": 45000000000, "딸 D": 10000000000} }, explanation: "1. 법정상속분(700억 기준): B:C:D=1.5:1:1. B=300억, C=200억, D=200억. 2. 유류분: B의 유류분은 150억, D의 유류분은 100억입니다. 3. 유류분 반환: C는 유언으로 700억을 받았습니다. B와 D는 유류분 부족액(각각 150억, 100억)을 C에게 청구합니다. 4. 최종: B=150억, D=100억. C=700억-150억-100억=450억." },
+                { text: "피상속인 A(재산 700억)와 그의 아들 C는 같은 사고로 동시에 사망했습니다. A에게는 배우자 B와 딸 D가 있습니다. C에게는 배우자 E와 아들 F가 있습니다. A의 재산은 어떻게 분배될까요?", characters: ["배우자 B", "딸 D", "C의 배우자 E", "C의 아들 F"], solution: { amounts: {"배우자 B": 30000000000, "딸 D": 20000000000, "C의 배우자 E": 12000000000, "C의 아들 F": 8000000000} }, explanation: "동시사망의 경우에도 대습상속이 인정됩니다. 따라서 A의 상속인은 배우자 B, 딸 D, 그리고 C의 지위를 대습상속하는 E와 F입니다. 상속비율은 B:D:[C의 지위] = 1.5:1:1 입니다. 1지분은 200억(700억/3.5)입니다. 따라서 B는 300억, D는 200억, [C의 지위]는 200억입니다. 이 200억을 C의 배우자 E와 자녀 F가 1.5:1의 비율로 나누므로, E는 120억, F는 80억을 상속받습니다." },
+                { text: "피상속인 A(재산 300억)에게는 배우자 B, 아들 C(A보다 먼저 사망), 딸 D가 있습니다. C에게는 배우자 E와 자녀 F가 있습니다. A 사망 후, 딸 D는 법원에 상속 포기를 신고했습니다. 최종 상속액은 어떻게 될까요?", characters: ["배우자 B", "딸 D", "C의 배우자 E", "C의 자녀 F"], solution: { amounts: {"배우자 B": 18000000000, "C의 배우자 E": 7200000000, "C의 자녀 F": 4800000000} }, explanation: "상속인 D가 상속을 포기하면, 그의 상속분은 다른 공동상속인(B, C)에게 법정상속분 비율로 귀속됩니다. C는 이미 사망했으므로 C의 대습상속인(E, F)이 그 지위를 승계합니다. 따라서 포기된 D의 지분은 B와 [E,F]에게 1.5:1의 비율로 더해집니다. 최종적으로 상속비율은 B:C(대습) = 1.5:1이 되고, A의 재산 300억원은 B가 180억, C의 상속분 120억을 E와 F가 1.5:1로 나누어 E가 72억, F가 48억을 상속받습니다."}
+            ]
+        };
 
+        // --- 시뮬레이터 핵심 로직 ---
         let currentScore = 0;
+        let currentDifficulty = '';
         let currentScenario = {};
         let usedIndices = new Set();
+        let scenariosForDifficulty = [];
+        let draggedElement = null;
 
+        const difficultySelector = document.getElementById('difficulty-selector');
+        const simulatorMain = document.getElementById('simulator-main');
+        const simulatorTitle = document.getElementById('simulator-title');
         const scoreDisplay = document.getElementById('score-display');
         const scenarioText = document.getElementById('scenario-text');
-        const heirOptionsContainer = document.getElementById('heir-options');
-        const amountInputsContainer = document.getElementById('amount-inputs');
+        const heirDropZonesContainer = document.getElementById('heir-drop-zones');
+        const cardHolder = document.getElementById('card-holder');
+        const amountInput = document.getElementById('amount-input');
+        const createCardBtn = document.getElementById('create-card-btn');
         const submitBtn = document.getElementById('submit-btn');
         const nextBtn = document.getElementById('next-btn');
-        const modal = document.getElementById('modal');
+        const backBtn = document.getElementById('back-btn');
+        const answerModal = document.getElementById('answer-modal');
         const modalResult = document.getElementById('modal-result');
         const modalExplanation = document.getElementById('modal-explanation');
 
-        function formatCurrency(amount) {
-            if (amount >= 100000000) {
-                const eok = Math.floor(amount / 100000000);
-                const man = Math.round((amount % 100000000) / 10000);
-                return man > 0 ? `${eok}억 ${man}만원` : `${eok}억원`;
-            } else {
-                return `${amount / 10000}만원`;
-            }
+        function showDifficultyScreen() {
+            difficultySelector.style.display = 'block';
+            simulatorMain.style.display = 'none';
+            if (scalesOfJustice) scalesOfJustice.visible = false;
+        }
+
+        function showSimulatorScreen(difficulty) {
+            currentDifficulty = difficulty;
+            const difficultyKorean = {easy: '쉬움', medium: '중간', hard: '어려움', very_hard: '매우 어려움'};
+            simulatorTitle.textContent = `사례 분석 (${difficultyKorean[difficulty]})`;
+            scenariosForDifficulty = ALL_SCENARIOS[currentDifficulty];
+            usedIndices.clear();
+            currentScore = 0;
+            scoreDisplay.textContent = `점수: ${currentScore}`;
+            difficultySelector.style.display = 'none';
+            simulatorMain.style.display = 'block';
+            if (scalesOfJustice) scalesOfJustice.visible = true;
+            loadScenario();
         }
         
         function parseAmount(inputStr) {
+            if (!inputStr || typeof inputStr !== 'string') return 0;
+            let tempStr = inputStr.trim().replace(/,|원|\s/g, '');
             let total = 0;
-            const eokMatch = inputStr.match(/(\d+)\s*억/);
-            const manMatch = inputStr.match(/(\d+)\s*만/);
-            if(eokMatch) total += parseInt(eokMatch[1]) * 100000000;
-            if(manMatch) total += parseInt(manMatch[1]) * 10000;
-            if (!eokMatch && !manMatch && !isNaN(parseInt(inputStr.replace(/,/g, '')))) {
-                 total += parseInt(inputStr.replace(/,/g, ''));
+
+            const units = [
+                { key: '조', val: 1000000000000 },
+                { key: '억', val: 100000000 },
+                { key: '만', val: 10000 }
+            ];
+
+            const koreanNumMap = { '일': 1, '이': 2, '삼': 3, '사': 4, '오': 5, '육': 6, '칠': 7, '팔': 8, '구': 9, '십': 10 };
+            const koreanUnitMap = { '십': 10, '백': 100, '천': 1000 };
+
+            tempStr = tempStr.replace(/[일이삼사오육칠팔구십백천]+/g, (match) => {
+                let num = 0;
+                let temp = 0;
+                if (match.startsWith('십')) match = '일' + match;
+                for (let i = 0; i < match.length; i++) {
+                    const char = match[i];
+                    if (koreanUnitMap[char]) {
+                        num += (temp || 1) * koreanUnitMap[char];
+                        temp = 0;
+                    } else if (koreanNumMap[char]) {
+                        temp = koreanNumMap[char];
+                    }
+                }
+                return num + temp;
+            });
+            
+            tempStr = tempStr.replace(/\s/g, '');
+
+            for (const unit of units) {
+                const parts = tempStr.split(unit.key);
+                if (parts.length > 1) {
+                    if (parts[0] && !isNaN(parts[0])) {
+                        total += parseFloat(parts[0]) * unit.val;
+                    }
+                    tempStr = parts.slice(1).join(unit.key) || '';
+                }
             }
+
+            if (tempStr && !isNaN(tempStr)) {
+                total += parseFloat(tempStr);
+            }
+            
             return total;
         }
 
+        function numberToKorean(number) {
+            const units = ['', '만', '억', '조'];
+            const smallUnits = ['', '십', '백', '천'];
+            const numChars = ['영', '일', '이', '삼', '사', '오', '육', '칠', '팔', '구'];
+            let result = '';
+            let unitIndex = 0;
+            if (number === 0) return '영원';
+            while (number > 0) {
+                const part = number % 10000;
+                if (part > 0) {
+                    let partStr = '';
+                    for (let i = 0; i < 4; i++) {
+                        const digit = Math.floor(part / (10**i)) % 10;
+                        if (digit > 0) { partStr = (digit > 1 ? numChars[digit] : '') + smallUnits[i] + partStr; }
+                    }
+                    result = partStr.replace(/^일([십백천])/g, '$1') + units[unitIndex] + ' ' + result;
+                }
+                number = Math.floor(number / 10000);
+                unitIndex++;
+            }
+            return result.trim() + '원';
+        }
+
+        function createAmountCard() {
+            const amountValue = parseAmount(amountInput.value);
+            if (amountValue <= 0) return;
+            const koreanText = numberToKorean(amountValue);
+            const card = document.createElement('div');
+            card.className = 'amount-card';
+            card.draggable = true;
+            card.textContent = koreanText;
+            card.dataset.amount = amountValue;
+            
+            const deleteBtn = document.createElement('span');
+            deleteBtn.className = 'delete-card-btn';
+            deleteBtn.innerHTML = '&times;';
+            deleteBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                card.remove();
+            });
+            card.appendChild(deleteBtn);
+
+            card.addEventListener('dragstart', handleDragStart);
+            card.addEventListener('dragend', handleDragEnd);
+            cardHolder.appendChild(card);
+            amountInput.value = '';
+        }
 
         function loadScenario() {
-            if (usedIndices.size === scenarios.length) {
-                scenarioText.innerHTML = "모든 문제를 다 푸셨습니다! 최종 점수를 확인하세요.";
+            if (usedIndices.size >= scenariosForDifficulty.length) {
+                scenarioText.innerHTML = `<strong>${currentDifficulty.toUpperCase()} 난이도의 모든 문제를 해결했습니다!</strong><br>최종 점수를 확인하세요. 다른 난이도에 도전해 보세요.`;
+                document.getElementById('interaction-area').style.display = 'none';
                 submitBtn.style.display = 'none';
                 nextBtn.style.display = 'none';
                 return;
@@ -417,113 +473,135 @@
 
             let randomIndex;
             do {
-                randomIndex = Math.floor(Math.random() * scenarios.length);
+                randomIndex = Math.floor(Math.random() * scenariosForDifficulty.length);
             } while (usedIndices.has(randomIndex));
             
             usedIndices.add(randomIndex);
-            currentScenario = scenarios[randomIndex];
+            currentScenario = scenariosForDifficulty[randomIndex];
 
             scenarioText.innerHTML = currentScenario.text;
-            heirOptionsContainer.innerHTML = '';
-            amountInputsContainer.innerHTML = '';
+            document.getElementById('interaction-area').style.display = 'block';
+            heirDropZonesContainer.innerHTML = '';
+            cardHolder.innerHTML = '';
+            amountInput.value = '';
             
-            currentScenario.possible_heirs.forEach(heir => {
-                const heirId = `heir_${heir.replace(/\s/g, '')}`;
-                heirOptionsContainer.innerHTML += `
-                    <div class="heir-option">
-                        <label for="${heirId}">
-                            <input type="checkbox" id="${heirId}" name="heirs" value="${heir}">
-                            <span>${heir}</span>
-                        </label>
-                    </div>
-                `;
+            currentScenario.characters.forEach(heir => {
+                const dropZone = document.createElement('div');
+                dropZone.className = 'drop-zone';
+                dropZone.dataset.heir = heir;
+                dropZone.innerHTML = `<span class="drop-zone-label">${heir}</span>`;
+                heirDropZonesContainer.appendChild(dropZone);
             });
-            
-            // Add event listeners to checkboxes to show/hide amount inputs
-            document.querySelectorAll('input[name="heirs"]').forEach(checkbox => {
-                checkbox.addEventListener('change', updateAmountInputs);
-            });
-
-            updateAmountInputs(); // Initial call
             
             submitBtn.style.display = 'inline-block';
             nextBtn.style.display = 'none';
         }
-        
-        function updateAmountInputs() {
-            amountInputsContainer.innerHTML = '';
-            const selectedHeirs = Array.from(document.querySelectorAll('input[name="heirs"]:checked')).map(cb => cb.value);
-            
-            selectedHeirs.forEach(heir => {
-                const inputId = `amount_${heir.replace(/\s/g, '')}`;
-                amountInputsContainer.innerHTML += `
-                    <div class="amount-input-group">
-                         <label for="${inputId}">${heir}:</label>
-                         <input type="text" id="${inputId}" placeholder="예: 52억 5000만원">
-                         <span class="unit-helper">억원/만원 단위로 입력</span>
-                    </div>
-                `;
-            });
-        }
 
         function checkAnswer() {
-            const selectedHeirs = new Set(Array.from(document.querySelectorAll('input[name="heirs"]:checked')).map(cb => cb.value));
-            const correctHeirs = new Set(currentScenario.solution.heirs);
+            const userAnswers = {};
+            document.querySelectorAll('.drop-zone').forEach(zone => {
+                const heir = zone.dataset.heir;
+                const card = zone.querySelector('.amount-card');
+                if (card) { userAnswers[heir] = parseInt(card.dataset.amount, 10); }
+            });
 
-            let isHeirCorrect = selectedHeirs.size === correctHeirs.size && [...selectedHeirs].every(heir => correctHeirs.has(heir));
-            
-            let isAmountCorrect = true;
-            if (isHeirCorrect) {
-                for(const heir of correctHeirs) {
-                    const inputId = `amount_${heir.replace(/\s/g, '')}`;
-                    const userInput = document.getElementById(inputId).value;
-                    const userAmount = parseAmount(userInput);
-                    if(userAmount !== currentScenario.solution.amounts[heir]) {
-                        isAmountCorrect = false;
+            const correctSolution = currentScenario.solution.amounts;
+            const correctHeirs = Object.keys(correctSolution);
+            const userHeirs = Object.keys(userAnswers);
+
+            let isCorrect = correctHeirs.length === userHeirs.length;
+            if (isCorrect) {
+                for (const heir of correctHeirs) {
+                    if (userAnswers[heir] !== correctSolution[heir]) {
+                        isCorrect = false;
                         break;
                     }
                 }
-            } else {
-                isAmountCorrect = false;
             }
+            
+            answerModal.style.display = 'block';
+            modalExplanation.innerHTML = `<strong>해설:</strong><br>${currentScenario.explanation.replace(/\n/g, '<br>')}`;
 
-            modal.style.display = 'block';
-            modalExplanation.innerHTML = `<strong>해설:</strong> ${currentScenario.explanation}`;
-
-            if (isHeirCorrect && isAmountCorrect) {
+            nextBtn.classList.remove('correct', 'incorrect');
+            if (isCorrect) {
                 modalResult.textContent = "정답입니다!";
-                modalResult.style.color = "var(--accent-color)";
-                modal.querySelector('.modal-content').style.borderColor = "var(--accent-color)";
+                modalResult.style.color = "var(--success-color)";
+                answerModal.querySelector('.modal-content').style.borderColor = "var(--success-color)";
+                nextBtn.classList.add('correct');
                 currentScore += 10;
                 scoreDisplay.textContent = `점수: ${currentScore}`;
-                 // Correct animation
                 scoreDisplay.style.transform = 'scale(1.2)';
                 setTimeout(() => { scoreDisplay.style.transform = 'scale(1)'; }, 300);
             } else {
                 modalResult.textContent = "오답입니다.";
                 modalResult.style.color = "var(--error-color)";
-                modal.querySelector('.modal-content').style.borderColor = "var(--error-color)";
+                answerModal.querySelector('.modal-content').style.borderColor = "var(--error-color)";
+                nextBtn.classList.add('incorrect');
             }
             
             submitBtn.style.display = 'none';
             nextBtn.style.display = 'inline-block';
         }
 
-        submitBtn.addEventListener('click', checkAnswer);
-        nextBtn.addEventListener('click', () => {
-            modal.style.display = 'none';
-            loadScenario();
-        });
-        
-        // Close modal if clicked outside
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) {
-                modal.style.display = 'none';
-            }
-        });
+        // --- 드래그 앤 드롭 핸들러 ---
+        function handleDragStart(e) {
+            draggedElement = e.target;
+            e.dataTransfer.setData('text/plain', e.target.textContent);
+            setTimeout(() => e.target.classList.add('dragging'), 0);
+        }
 
-        // Initial Load
-        loadScenario();
+        function handleDragEnd(e) {
+            e.target.classList.remove('dragging');
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            const target = e.target.closest('.drop-zone, #amount-card-pool');
+            if (target) {
+                target.classList.add('over');
+            }
+        }
+
+        function handleDragLeave(e) {
+            const target = e.target.closest('.drop-zone, #amount-card-pool');
+            if (target) {
+                target.classList.remove('over');
+            }
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            const target = e.target.closest('.drop-zone, #amount-card-pool');
+            if (target) {
+                target.classList.remove('over');
+                if (draggedElement) {
+                    const isDropZone = target.classList.contains('drop-zone');
+                    const isPool = target.id === 'amount-card-pool';
+                    
+                    if (isDropZone && !target.querySelector('.amount-card')) {
+                        target.appendChild(draggedElement);
+                    } else if (isPool) {
+                        target.querySelector('#card-holder').appendChild(draggedElement);
+                    }
+                }
+            }
+        }
+
+        // --- 이벤트 리스너 ---
+        document.querySelectorAll('.difficulty-btn').forEach(btn => btn.addEventListener('click', e => showSimulatorScreen(e.target.dataset.difficulty)));
+        backBtn.addEventListener('click', showDifficultyScreen);
+        createCardBtn.addEventListener('click', createAmountCard);
+        amountInput.addEventListener('keydown', e => { if (e.key === 'Enter') createAmountCard(); });
+        submitBtn.addEventListener('click', checkAnswer);
+        nextBtn.addEventListener('click', () => { answerModal.style.display = 'none'; loadScenario(); });
+        answerModal.addEventListener('click', e => { if (e.target === answerModal) answerModal.style.display = 'none'; });
+        
+        document.addEventListener('dragover', handleDragOver);
+        document.addEventListener('dragleave', handleDragLeave);
+        document.addEventListener('drop', handleDrop);
+
+        // 초기 로드
+        showDifficultyScreen();
     </script>
 </body>
 </html>
