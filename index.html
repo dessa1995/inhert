@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>상속법 사례 분석 시뮬레이터 (클릭 & 재시도 버전)</title>
+    <title>상속법 사례 분석 시뮬레이터</title>
     <style>
         :root {
             --primary-bg: #f4f7f9;
@@ -69,7 +69,14 @@
         }
 
         /* 난이도 선택 화면 */
-        #difficulty-selector { text-align: center; }
+        #difficulty-selector {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 2rem 2.5rem 3rem;
+        }
         .main-title-card {
             background: linear-gradient(135deg, var(--accent-color) 0%, var(--accent-color-darker) 100%);
             color: #fff;
@@ -78,6 +85,8 @@
             margin-bottom: 2.5rem;
             text-align: center;
             box-shadow: 0 8px 20px rgba(52, 152, 219, 0.3);
+            width: 100%;
+            max-width: 500px;
         }
         .main-title-card .title-icon { font-size: 2.5rem; display: block; margin-bottom: 0.5rem; }
         .main-title-card h2 { margin: 0; font-size: 2.2rem; font-weight: bold; }
@@ -86,6 +95,25 @@
         .difficulty-buttons { display: flex; justify-content: center; gap: 1.5rem; flex-wrap: wrap; }
         .difficulty-btn { padding: 1rem 2rem; font-size: 1.2rem; font-weight: bold; border: 2px solid var(--accent-color); border-radius: 8px; cursor: pointer; transition: all 0.3s ease; background-color: transparent; color: var(--accent-color); }
         .difficulty-btn:hover { background-color: var(--accent-color); color: #fff; box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4); transform: translateY(-5px); }
+
+        .info-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            padding: 0.4rem 0.8rem;
+            font-size: 0.85rem;
+            font-weight: bold;
+            border: 1px solid #bdc3c7;
+            border-radius: 20px;
+            cursor: pointer;
+            background-color: transparent;
+            color: #7f8c8d;
+            transition: all 0.3s ease;
+        }
+        .info-btn:hover {
+            background-color: #ecf0f1;
+            color: #34495e;
+        }
 
         /* 시뮬레이터 메인 화면 */
         #simulator-main { display: none; }
@@ -107,13 +135,43 @@
         .amount-card-creator button { padding: 0.7rem 1.2rem; margin-left: 0.5rem; background: var(--accent-color); color: #fff; border: none; border-radius: 20px; cursor: pointer; font-weight: bold; transition: background-color 0.3s; }
         .amount-card-creator button:hover { background-color: var(--accent-color-darker); }
         
+        .amount-helper-btns {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        .helper-btn {
+            flex: 1;
+            padding: 0.6rem;
+            font-size: 0.9rem;
+            font-weight: bold;
+            border: 1px solid #dce4ec;
+            border-radius: 20px;
+            cursor: pointer;
+            background-color: #f8f9fa;
+            color: var(--body-text-color);
+            transition: all 0.2s ease;
+        }
+        .helper-btn:hover {
+            background-color: #e9eef2;
+            border-color: #ced8e0;
+        }
+        #clear-amount-btn {
+            background-color: #e74c3c;
+            color: white;
+            border-color: transparent;
+        }
+        #clear-amount-btn:hover {
+            background-color: #c0392b;
+        }
+
         #card-holder { min-height: 50px; }
         .amount-card { position: relative; background: linear-gradient(135deg, var(--accent-color) 0%, var(--accent-color-darker) 100%); color: #fff; padding: 1rem; padding-right: 2.5rem; border-radius: 8px; text-align: center; font-weight: bold; cursor: pointer; user-select: none; border: 2px solid transparent; margin-top: 0.5rem; box-shadow: 0 4px 6px rgba(50,50,93,.11), 0 1px 3px rgba(0,0,0,.08); transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s; }
         .amount-card:active { transform: scale(0.95); }
         .amount-card.selected {
-            border-color: var(--accent-color-darker);
-            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
-            transform: translateY(-5px);
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 0 0 3px var(--secondary-bg), 0 0 0 5px var(--accent-color-darker);
         }
         .delete-card-btn { position: absolute; top: 50%; right: 10px; transform: translateY(-50%); font-size: 1.5rem; line-height: 1; font-weight: bold; color: rgba(255, 255, 255, 0.7); cursor: pointer; transition: color 0.2s, transform 0.2s; }
         .delete-card-btn:hover { color: #fff; transform: translateY(-50%) scale(1.2); }
@@ -135,9 +193,21 @@
         #back-btn { background-color: #95a5a6; }
         #back-btn:hover { background-color: #7f8c8d; }
 
-        /* 모달 (정답/용어집) */
+        /* 모달 (정답/용어집/사용설명) */
         .modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); animation: fadeIn 0.5s; }
         .modal-content { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: var(--secondary-bg); padding: 2.5rem; border-radius: 10px; width: 80%; max-width: 700px; border-top: 5px solid; animation: slideIn 0.5s forwards; max-height: 80vh; overflow-y: auto; box-shadow: 0 10px 30px rgba(44, 62, 80, 0.2); }
+        .modal .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #aaa;
+            cursor: pointer;
+            transition: color 0.2s;
+            line-height: 1;
+        }
+        .modal .close-btn:hover { color: #333; }
         #modal-result, #glossary-title { font-size: 2.2rem; font-weight: bold; margin-bottom: 1.5rem; text-align: center; }
         #modal-explanation, #glossary-definition { background-color: #f8f9fa; border: 1px solid #e9ecef; padding: 1.5rem; border-radius: 5px; line-height: 1.8; font-size: 1.1rem; }
 
@@ -166,6 +236,7 @@
         <div id="sound-toggle">🔊</div>
 
         <div id="difficulty-selector" class="ui-panel">
+            <button id="how-to-use-btn" class="info-btn">사용설명</button>
              <div class="main-title-card">
                  <span class="title-icon">⚖️</span>
                  <h2>솔로몬의 선택</h2>
@@ -192,8 +263,14 @@
                     <div id="amount-card-pool">
                         <div class="amount-card-creator">
                             <span class="creator-icon">💰</span>
-                            <input type="text" id="amount-input" placeholder="금액 입력 (예: 1억 5000만)">
+                            <input type="text" id="amount-input" placeholder="금액 입력 또는 버튼으로 추가">
                             <button id="create-card-btn">생성</button>
+                        </div>
+                        <div class="amount-helper-btns">
+                            <button class="helper-btn" id="add-10m-btn">+ 1천만</button>
+                            <button class="helper-btn" id="add-100m-btn">+ 1억</button>
+                            <button class="helper-btn" id="add-1b-btn">+ 10억</button>
+                            <button class="helper-btn" id="clear-amount-btn">지우기</button>
                         </div>
                         <div id="card-holder"></div>
                     </div>
@@ -218,6 +295,7 @@
 
     <div id="answer-modal" class="modal">
         <div class="modal-content">
+            <span class="close-btn">&times;</span>
             <h2 id="modal-result"></h2>
             <div id="modal-explanation"></div>
         </div>
@@ -225,8 +303,38 @@
 
     <div id="glossary-modal" class="modal">
         <div class="modal-content">
+            <span class="close-btn">&times;</span>
             <h2 id="glossary-title"></h2>
             <div id="glossary-definition"></div>
+        </div>
+    </div>
+    
+    <div id="how-to-use-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+            <h2 id="how-to-use-title" style="text-align: center; color: var(--accent-color);">프로그램 사용 설명</h2>
+            <div id="how-to-use-content">
+                <ol style="padding-left: 20px; line-height: 1.8; font-size: 1.05rem;">
+                    <li style="margin-bottom: 1rem;"><strong>난이도 선택:</strong> 메인 화면에서 원하는 학습 난이도를 선택하여 시작합니다.</li>
+                    <li style="margin-bottom: 1rem;"><strong>사례 확인:</strong> 화면에 제시된 상속 사례를 꼼꼼히 읽고 상속 관계를 파악합니다.</li>
+                    <li style="margin-bottom: 1rem;"><strong>금액 카드 생성:</strong>
+                        <ul style="padding-left: 20px; margin-top: 0.5rem;">
+                            <li>금액 입력창에 '1억 5000만'과 같이 직접 금액을 입력할 수 있습니다.</li>
+                            <li>'+1천만', '+1억' 버튼을 클릭하여 금액을 쉽게 더할 수 있습니다. '지우기' 버튼으로 초기화합니다.</li>
+                            <li>금액 설정 후 '생성' 버튼을 누르면 아래에 금액 카드가 만들어집니다.</li>
+                        </ul>
+                    </li>
+                    <li style="margin-bottom: 1rem;"><strong>상속액 분배:</strong>
+                        <ul style="padding-left: 20px; margin-top: 0.5rem;">
+                            <li>생성된 금액 카드를 클릭하여 선택합니다. (선택된 카드는 파란색 테두리로 표시됩니다.)</li>
+                            <li>금액을 배분할 상속인의 회색 영역을 클릭하면, 선택된 카드가 해당 상속인에게 이동합니다.</li>
+                            <li>카드를 잘못 옮겼을 경우, 옮겨진 카드를 다시 클릭하여 선택한 후 상단의 카드 생성 영역을 클릭하면 원래 위치로 돌아옵니다.</li>
+                        </ul>
+                    </li>
+                    <li style="margin-bottom: 1rem;"><strong>결과 확인:</strong> 모든 금액 분배가 끝나면 '결과 확인' 버튼을 눌러 정답과 해설을 확인합니다.</li>
+                    <li><strong>반복 학습:</strong> '다음 문제'를 풀어보거나 '다시 풀기'로 복습할 수 있습니다. '난이도 선택으로' 버튼을 누르면 메인 화면으로 돌아갑니다.</li>
+                </ol>
+            </div>
         </div>
     </div>
 
@@ -350,8 +458,15 @@
         const modalResult = document.getElementById('modal-result');
         const modalExplanation = document.getElementById('modal-explanation');
 
+        const add10MBtn = document.getElementById('add-10m-btn');
+        const add100MBtn = document.getElementById('add-100m-btn');
+        const add1BBtn = document.getElementById('add-1b-btn');
+        const clearAmountBtn = document.getElementById('clear-amount-btn');
+        const howToUseBtn = document.getElementById('how-to-use-btn');
+        const howToUseModal = document.getElementById('how-to-use-modal');
+        
         function showDifficultyScreen() {
-            difficultySelector.style.display = 'block';
+            difficultySelector.style.display = 'flex';
             simulatorMain.style.display = 'none';
             if (scalesOfJustice) scalesOfJustice.visible = false;
         }
@@ -418,6 +533,16 @@
             
             return total;
         }
+        
+        function formatAmount(number) {
+            if (number === 0) return "";
+            const eok = Math.floor(number / 100000000);
+            const man = Math.floor((number % 100000000) / 10000);
+            let str = "";
+            if (eok > 0) str += `${eok}억`;
+            if (man > 0) str += ` ${man}만`;
+            return str.trim();
+        }
 
         function numberToKorean(number) {
             const units = ['', '만', '억', '조'];
@@ -432,14 +557,15 @@
                     let partStr = '';
                     for (let i = 0; i < 4; i++) {
                         const digit = Math.floor(part / (10**i)) % 10;
-                        if (digit > 0) { partStr = (digit > 1 ? numChars[digit] : '') + smallUnits[i] + partStr; }
+                        if (digit > 0) { partStr = (digit > 1 ? String(Math.floor(part)).replace(/\B(?=(\d{4})+(?!\d))/g, ",") : '') + smallUnits[i] + partStr; }
                     }
-                    result = partStr.replace(/^일([십백천])/g, '$1') + units[unitIndex] + ' ' + result;
+                     // Use numbers instead of Korean characters for readability
+                    result = String(part).replace(/\B(?=(\d{4})+(?!\d))/g, ",") + units[unitIndex] + ' ' + result;
                 }
                 number = Math.floor(number / 10000);
                 unitIndex++;
             }
-            return result.trim() + '원';
+            return result.trim().replace(/,만/g, "만").replace(/,억/g, "억").replace(/,조/g, "조") + '원';
         }
 
         function createAmountCard() {
@@ -621,12 +747,41 @@
             }
         });
         
+        document.querySelectorAll('.modal .close-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.target.closest('.modal').style.display = 'none';
+            });
+        });
+
         answerModal.addEventListener('click', e => { if (e.target === answerModal) answerModal.style.display = 'none'; });
+        howToUseModal.addEventListener('click', e => { if (e.target === howToUseModal) howToUseModal.style.display = 'none'; });
+        
         amountCardPool.addEventListener('click', handleZoneClick);
+        
+        add10MBtn.addEventListener('click', () => {
+            const currentValue = parseAmount(amountInput.value) || 0;
+            amountInput.value = formatAmount(currentValue + 10000000);
+        });
+        add100MBtn.addEventListener('click', () => {
+            const currentValue = parseAmount(amountInput.value) || 0;
+            amountInput.value = formatAmount(currentValue + 100000000);
+        });
+        add1BBtn.addEventListener('click', () => {
+            const currentValue = parseAmount(amountInput.value) || 0;
+            amountInput.value = formatAmount(currentValue + 1000000000);
+        });
+        clearAmountBtn.addEventListener('click', () => {
+            amountInput.value = '';
+        });
+
+        howToUseBtn.addEventListener('click', () => {
+            howToUseModal.style.display = 'block';
+        });
 
         // 초기 로드
         showDifficultyScreen();
     </script>
 </body>
 </html>
+
 
