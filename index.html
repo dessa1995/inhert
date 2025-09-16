@@ -132,7 +132,7 @@
         .amount-card-creator .creator-icon { font-size: 1.2rem; margin-right: 0.5rem; }
         .amount-card-creator input { flex-grow: 1; border: none; background: transparent; color: var(--text-color); font-size: 1rem; padding: 0.5rem; }
         .amount-card-creator input:focus { outline: none; }
-        .amount-card-creator button { padding: 0.7rem 1.2rem; margin-left: 0.5rem; background: var(--accent-color); color: #fff; border: none; border-radius: 20px; cursor: pointer; font-weight: bold; transition: background-color 0.3s; }
+        .amount-card-creator button { padding: 0.7rem 1.2rem; margin-left: 0.5rem; background: var(--accent-color); color: #fff; border: none; border-radius: 20px; cursor: pointer; font-weight: bold; transition: background-color 0.3s, transform 0.1s ease; }
         .amount-card-creator button:hover { background-color: var(--accent-color-darker); }
         
         .amount-helper-btns {
@@ -192,6 +192,16 @@
         #next-btn.incorrect:hover { background-color: var(--error-color-darker); }
         #back-btn { background-color: #95a5a6; }
         #back-btn:hover { background-color: #7f8c8d; }
+
+        /* 터치 피드백 강화 */
+        .difficulty-btn:active,
+        .info-btn:active,
+        .amount-card-creator button:active,
+        .helper-btn:active,
+        .action-btn:active {
+            transform: scale(0.97);
+            transition: transform 0.1s ease;
+        }
 
         /* 모달 (정답/용어집/사용설명) */
         .modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); animation: fadeIn 0.5s; }
@@ -495,28 +505,7 @@
                 { key: '억', val: 100000000 },
                 { key: '만', val: 10000 }
             ];
-
-            const koreanNumMap = { '일': 1, '이': 2, '삼': 3, '사': 4, '오': 5, '육': 6, '칠': 7, '팔': 8, '구': 9, '십': 10 };
-            const koreanUnitMap = { '십': 10, '백': 100, '천': 1000 };
-
-            tempStr = tempStr.replace(/[일이삼사오육칠팔구십백천]+/g, (match) => {
-                let num = 0;
-                let temp = 0;
-                if (match.startsWith('십')) match = '일' + match;
-                for (let i = 0; i < match.length; i++) {
-                    const char = match[i];
-                    if (koreanUnitMap[char]) {
-                        num += (temp || 1) * koreanUnitMap[char];
-                        temp = 0;
-                    } else if (koreanNumMap[char]) {
-                        temp = koreanNumMap[char];
-                    }
-                }
-                return num + temp;
-            });
             
-            tempStr = tempStr.replace(/\s/g, '');
-
             for (const unit of units) {
                 const parts = tempStr.split(unit.key);
                 if (parts.length > 1) {
@@ -534,44 +523,40 @@
             return total;
         }
         
-        function formatAmount(number) {
-            if (number === 0) return "";
-            const eok = Math.floor(number / 100000000);
-            const man = Math.floor((number % 100000000) / 10000);
-            let str = "";
-            if (eok > 0) str += `${eok}억`;
-            if (man > 0) str += ` ${man}만`;
-            return str.trim();
+        function formatKoreanCurrency(number, includeUnit = false) {
+            if (number === 0) return includeUnit ? '0원' : '0';
+            
+            const units = [
+                { value: 1000000000000, name: '조' },
+                { value: 100000000, name: '억' },
+                { value: 10000, name: '만' }
+            ];
+            
+            let result = '';
+            let tempNum = number;
+
+            for (const unit of units) {
+                if (tempNum >= unit.value) {
+                    const value = Math.floor(tempNum / unit.value);
+                    result += `${value.toLocaleString('ko-KR')}${unit.name} `;
+                    tempNum %= unit.value;
+                }
+            }
+
+            if (tempNum > 0) {
+                 result += `${tempNum.toLocaleString('ko-KR')}`;
+            }
+            
+            result = result.trim();
+            
+            return includeUnit ? result + '원' : result;
         }
 
-        function numberToKorean(number) {
-            const units = ['', '만', '억', '조'];
-            const smallUnits = ['', '십', '백', '천'];
-            const numChars = ['영', '일', '이', '삼', '사', '오', '육', '칠', '팔', '구'];
-            let result = '';
-            let unitIndex = 0;
-            if (number === 0) return '영원';
-            while (number > 0) {
-                const part = number % 10000;
-                if (part > 0) {
-                    let partStr = '';
-                    for (let i = 0; i < 4; i++) {
-                        const digit = Math.floor(part / (10**i)) % 10;
-                        if (digit > 0) { partStr = (digit > 1 ? String(Math.floor(part)).replace(/\B(?=(\d{4})+(?!\d))/g, ",") : '') + smallUnits[i] + partStr; }
-                    }
-                     // Use numbers instead of Korean characters for readability
-                    result = String(part).replace(/\B(?=(\d{4})+(?!\d))/g, ",") + units[unitIndex] + ' ' + result;
-                }
-                number = Math.floor(number / 10000);
-                unitIndex++;
-            }
-            return result.trim().replace(/,만/g, "만").replace(/,억/g, "억").replace(/,조/g, "조") + '원';
-        }
 
         function createAmountCard() {
             const amountValue = parseAmount(amountInput.value);
             if (amountValue <= 0) return;
-            const koreanText = numberToKorean(amountValue);
+            const koreanText = formatKoreanCurrency(amountValue, true);
             const card = document.createElement('div');
             card.className = 'amount-card';
             card.textContent = koreanText;
@@ -760,15 +745,15 @@
         
         add10MBtn.addEventListener('click', () => {
             const currentValue = parseAmount(amountInput.value) || 0;
-            amountInput.value = formatAmount(currentValue + 10000000);
+            amountInput.value = formatKoreanCurrency(currentValue + 10000000);
         });
         add100MBtn.addEventListener('click', () => {
             const currentValue = parseAmount(amountInput.value) || 0;
-            amountInput.value = formatAmount(currentValue + 100000000);
+            amountInput.value = formatKoreanCurrency(currentValue + 100000000);
         });
         add1BBtn.addEventListener('click', () => {
             const currentValue = parseAmount(amountInput.value) || 0;
-            amountInput.value = formatAmount(currentValue + 1000000000);
+            amountInput.value = formatKoreanCurrency(currentValue + 1000000000);
         });
         clearAmountBtn.addEventListener('click', () => {
             amountInput.value = '';
@@ -783,5 +768,4 @@
     </script>
 </body>
 </html>
-
 
